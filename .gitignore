@@ -1,0 +1,4 @@
+# Ignore ZIP files
+*.zip
+__pycache__/
+.DS_Store
