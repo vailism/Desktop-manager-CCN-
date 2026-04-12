@@ -1,0 +1,10 @@
+{
+  "server_ip": "127.0.0.1",
+  "port": 5500,
+  "password": "lan-demo-123",
+  "client_name": "node-01",
+  "auto_connect": true,
+  "fps": 2.0,
+  "jpeg_quality": 45,
+  "scale": 0.75
+}
