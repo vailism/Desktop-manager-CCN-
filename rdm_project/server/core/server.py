@@ -60,6 +60,7 @@ class RemoteManagerServer:
         # On-demand screenshot store (per client)
         self.screenshot_store: Dict[str, str] = {}
         self.screenshot_lock = threading.Lock()
+        self.console_enabled = True
 
     def _record_chat_event(self, from_client_id: str, to_client_id: str, text: str) -> None:
         with self.chat_lock:
@@ -647,9 +648,11 @@ class RemoteManagerServer:
         self.server_socket.listen()
         print(f"[SERVER] Listening on {self.host}:{self.port}")
 
-        command_thread = threading.Thread(target=self._command_input_loop, daemon=True)
-        command_thread.start()
+        if self.console_enabled:
+            command_thread = threading.Thread(target=self._command_input_loop, daemon=True)
+            command_thread.start()
 
+        # The display loop is mostly for standalone CLI usage; GUI replaces it.
         display_thread = threading.Thread(target=self._screen_display_loop, daemon=True)
         display_thread.start()
 
@@ -841,10 +844,11 @@ class RemoteManagerServer:
                                 },
                             )
 
-                            dt = now_ts - stats.get("last_frame_at", now_ts)
-                            inst_fps = 1.0 / dt if dt > 0 else 0.0
+                            dt = max(0.001, now_ts - stats.get("last_frame_at", now_ts))
+                            inst_fps = min(120.0, 1.0 / dt) if dt > 0 else 0.0
                             prev_fps = stats.get("fps", 0.0)
-                            stats["fps"] = inst_fps if prev_fps == 0.0 else (0.8 * prev_fps + 0.2 * inst_fps)
+                            # EMA for smooth FPS display
+                            stats["fps"] = inst_fps if prev_fps <= 0.0 else (0.85 * prev_fps + 0.15 * inst_fps)
                             stats["latency_ms"] = max(0.0, (now_ts - captured_at) * 1000.0)
                             stats["encoded_bytes"] = encoded_bytes
                             stats["frames_received"] = stats.get("frames_received", 0.0) + 1.0

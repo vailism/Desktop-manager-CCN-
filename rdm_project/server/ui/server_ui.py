@@ -798,8 +798,15 @@ class NetworkScannerPanel(QFrame):
         return ip, st, pt
 
     def _ping(self, ip):
+        system = platform.system().lower()
+        if system == "windows":
+            cmd = ["ping", "-n", "1", "-w", "1000", ip]
+        elif system == "darwin":
+            cmd = ["ping", "-c", "1", "-W", "1000", ip]
+        else: # linux
+            cmd = ["ping", "-c", "1", "-W", "1", ip]
         try:
-            return subprocess.run(["ping", "-c", "1", "-W", "1000", ip],
+            return subprocess.run(cmd,
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=1.5, check=False).returncode == 0
         except Exception: return False
 
@@ -1611,7 +1618,7 @@ class MainWindow(QMainWindow):
             )
 
     def closeEvent(self, event):
-        self.right_panel.scanner.shutdown()
+        self.right_panel.scanner.stop_scan()
         super().closeEvent(event)
 
 
@@ -1627,6 +1634,7 @@ def main():
 
     server = RemoteManagerServer(args.host, args.port, args.password)
     server._screen_display_loop = lambda: None
+    server.console_enabled = False
 
     threading.Thread(target=server.start, daemon=True).start()
 

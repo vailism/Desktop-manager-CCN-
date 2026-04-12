@@ -67,6 +67,7 @@ class ClientDashboard(QMainWindow):
         top.addWidget(self.endpoint_label)
 
         self.connect_btn = QPushButton("Connect")
+        self.connect_btn.setObjectName("ConnectBtn")
         self.connect_btn.clicked.connect(self._connect)
         top.addWidget(self.connect_btn)
 
@@ -167,48 +168,85 @@ class ClientDashboard(QMainWindow):
         self.client.on_chat_received = lambda f, t, m: self.signals.chat.emit(f, t, m)
         self.client.on_status_received = lambda payload: self.signals.status.emit(str(payload))
         self.client.on_file_received = lambda name, data: self.signals.file_received.emit(name, data)
-
-        self.setStyleSheet(
-            """
-            QMainWindow { background: #f4f7fb; }
-            QWidget { color: #0f172a; font-size: 13px; }
-            #Card {
-                background: #ffffff;
-                border: 1px solid #dce4ef;
-                border-radius: 12px;
-            }
-            #StatusText { font-weight: 700; }
-            #StatusDotOffline { color: #ef4444; font-size: 18px; }
-            #StatusDotOnline { color: #16a34a; font-size: 18px; }
-            #Endpoint { color: #475569; font-weight: 600; }
-            QLineEdit {
-                background: #fbfdff;
-                border: 1px solid #cdd7e4;
-                border-radius: 8px;
-                padding: 8px 10px;
-            }
-            QTextEdit {
-                background: #fbfdff;
-                border: 1px solid #cdd7e4;
-                border-radius: 10px;
-                padding: 8px;
-            }
-            QPushButton {
-                background: #111827;
-                color: #ffffff;
-                border: none;
-                border-radius: 8px;
-                padding: 8px 14px;
-                font-weight: 700;
-            }
-            QPushButton:disabled {
-                background: #9ca3af;
-            }
-            """
-        )
+        self.setStyleSheet(self._get_stylesheet())
 
         if auto_connect:
             self._connect()
+
+    def _get_stylesheet(self) -> str:
+        return """
+        * {
+            font-family: 'SF Pro Display', 'Inter', system-ui, sans-serif;
+            outline: none;
+        }
+        QMainWindow {
+            background-color: #0a0a0c;
+        }
+        #Card {
+            background-color: #111115;
+            border: 1px solid #222228;
+            border-radius: 12px;
+        }
+        QLabel { color: #f5f5f7; }
+        QLabel#StatusText { font-weight: 700; font-size: 14px; }
+        #StatusDotOffline { color: #f87171; font-size: 14px; }
+        #StatusDotOnline { color: #34d399; font-size: 14px; }
+        #Endpoint { color: #a1a1a8; font-weight: 600; font-size: 11px; }
+
+        QLineEdit {
+            background-color: #0e0e12;
+            border: 1px solid #222228;
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #f5f5f7;
+            font-size: 13px;
+        }
+        QLineEdit:focus {
+            border-color: #5b5ff7;
+        }
+        QTextEdit {
+            background-color: #0e0e12;
+            border: 1px solid #222228;
+            border-radius: 10px;
+            padding: 10px;
+            color: #f5f5f7;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        QPushButton {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #111827, stop:1 #1f2937);
+            color: #ffffff;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 600;
+        }
+        QPushButton:hover:enabled {
+            background: #1f2937;
+            border-color: #4b5563;
+        }
+        QPushButton:pressed:enabled {
+            background: #111827;
+        }
+        QPushButton#ConnectBtn {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #5b5ff7, stop:1 #a855f7);
+            border: none;
+        }
+        QPushButton#ConnectBtn:hover {
+            opacity: 0.9;
+        }
+        QPushButton:disabled {
+            background: #1a1a1e;
+            color: #4b4b55;
+            border-color: #222228;
+        }
+        QScrollBar:vertical {
+            background: transparent; width: 6px; margin: 4px; border-radius: 3px;
+        }
+        QScrollBar::handle:vertical {
+            background: #28282f; min-height: 20px; border-radius: 3px;
+        }
+        """
 
     def _endpoint_text(self) -> str:
         return f"{self.client.server_ip}:{self.client.server_port}"
@@ -347,6 +385,10 @@ class ClientDashboard(QMainWindow):
             self.chat_input.clear()
         else:
             self._append_log("Cannot send message: disconnected")
+
+    def closeEvent(self, event) -> None:
+        self.client.disconnect()
+        super().closeEvent(event)
 
 
 def run_dashboard(client: RemoteManagerClient, auto_connect: bool = False) -> None:
