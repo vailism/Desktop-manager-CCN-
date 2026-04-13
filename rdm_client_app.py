@@ -1,4 +1,8 @@
-"""PyInstaller-friendly client UI launcher."""
+"""
+Remote Desktop Manager (Nexus) — Client Launcher
+Primary entry point for the remote agent component.
+Initializes the background worker and UI dashboard for remote desktop control.
+"""
 
 import os
 import sys

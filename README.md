@@ -2,6 +2,16 @@
 
 A high-performance, cross-platform remote desktop management application built with Python. Designed with a premium, glassmorphism-inspired UI and a robust networking layer for real-time interaction, this application enables secure, efficient remote system management.
 
+## Project Description
+
+**Remote Desktop Manager (Nexus)** is a sophisticated, real-time administrative tool designed for IT professionals and power users. It streamlines the management of multiple remote endpoints through a unified, high-fidelity dashboard. By leveraging optimized socket protocols and hardware-accelerated rendering, Nexus provides a near-native experience even over high-latency networks.
+
+Key highlights include:
+- **Low-Latency Streaming**: Optimized JPEG compression and frame-skipping algorithms ensure smooth visual feedback.
+- **Enterprise-Grade UI**: A cinematic dark-mode interface built on PySide6, featuring smooth transitions and intuitive layout.
+- **Unified Control**: Centralized management for file transfers, system power states, volume controls, and network discovery.
+- **Security-First**: Token-based authentication and restricted LAN scanning capabilities keep your network environment secure.
+
 ## Features
 
 - **High-Performance Networking**: Built on robust socket-based communication with an optimized custom protocol.

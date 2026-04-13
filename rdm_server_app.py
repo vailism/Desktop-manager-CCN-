@@ -1,4 +1,9 @@
-"""PyInstaller-friendly server launcher."""
+"""
+Remote Desktop Manager (Nexus) — Server Launcher
+Primary entry point for the administrative dashboard and connection orchestrator.
+This module initializes the environment, sets up the system path, and triggers 
+the server-side application logic for the Nexus remote management suite.
+"""
 
 import os
 import sys
